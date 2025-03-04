@@ -82,9 +82,14 @@ class ListPermissions(commands.Cog):
         t = PrettyTable(["Permission", "Value"])
         for perm, value in role.permissions:
             t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for role: {results[0][0]}]```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        sending = f"```ini\n[Permissions for role: {results[0][0]}]```\n```py\n{t}"
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            # For the first page, append the closing code block.
+            await ctx.send(pages[0] + "\n```")
+            # For any subsequent pages, prepend with the python code block start and append the closing.
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
 
     @lp_guild.command(name="member")
     async def guild_member(self, ctx, member: discord.Member = None):
@@ -95,9 +100,14 @@ class ListPermissions(commands.Cog):
         t = PrettyTable(["Permission", "Value"])
         for perm, value in permissions:
             t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for user: {member.display_name}] in guild {ctx.guild.name}```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        sending = f"```ini\n[Permissions for user: {member.display_name}] in guild {ctx.guild.name}```\n```py\n{t}"
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            # First page: append the closing code block.
+            await ctx.send(pages[0] + "\n```")
+            # For subsequent pages: prepend with code block start and append the closing.
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
 
     @listpermissions.group(name="channel")
     async def lp_channel(self, ctx):
@@ -125,9 +135,12 @@ class ListPermissions(commands.Cog):
         t = PrettyTable(["Permission", "Value"])
         for perm, value in permissions:
             t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for user: {member.display_name}] in channel {channel.name}```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        sending = f"```ini\n[Permissions for user: {member.display_name}] in channel {channel.name}```\n```py\n{t}"
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            await ctx.send(pages[0] + "\n```")
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
 
     @lp_channel.command(name="role")
     async def channel_role(
@@ -171,9 +184,12 @@ class ListPermissions(commands.Cog):
         t = PrettyTable(["Permission", "Value"])
         for perm, value in permissions:
             t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for role: {results[0][0]} in channel {channel.name}]```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        sending = f"```ini\n[Permissions for role: {results[0][0]} in channel {channel.name}]```\n```py\n{t}"
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            await ctx.send(pages[0] + "\n```")
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
 
     @commands.guild_only()
     @commands.group(aliases=["ap"])
@@ -219,7 +235,7 @@ class ListPermissions(commands.Cog):
             t.add_row([perm, value])
         sending = f"```ini\n[Available permissions for role: {results[0][0]}]```\n```py\n{t}```"
         for page in pagify(sending):
-            await ctx.send(sending)
+            await ctx.send(page)
 
     @ap_guild.command(name="member")
     async def ap_guild_member(self, ctx, member: discord.Member = None):
@@ -234,7 +250,7 @@ class ListPermissions(commands.Cog):
             t.add_row([perm, value])
         sending = f"```ini\n[Available Permissions for user: {member.display_name}] in guild {ctx.guild.name}```\n```py\n{t}```"
         for page in pagify(sending):
-            await ctx.send(sending)
+            await ctx.send(page)
 
     @availablepermissions.group(name="channel")
     async def ap_channel(self, ctx):
@@ -266,7 +282,7 @@ class ListPermissions(commands.Cog):
             t.add_row([perm, value])
         sending = f"```ini\n[Available permissions for user: {member.display_name}] in channel {channel.name}```\n```py\n{t}```"
         for page in pagify(sending):
-            await ctx.send(sending)
+            await ctx.send(page)
 
     @ap_channel.command(name="role")
     async def ap_channel_role(
@@ -314,7 +330,7 @@ class ListPermissions(commands.Cog):
             t.add_row([perm, value])
         sending = f"```ini\n[Permissions for role: {results[0][0]} in channel {channel.name}]```\n```py\n{t}```"
         for page in pagify(sending):
-            await ctx.send(sending)
+            await ctx.send(page)
 
     @commands.guild_only()
     @commands.group(aliases=["dp"])
@@ -358,9 +374,13 @@ class ListPermissions(commands.Cog):
             if value:
                 continue
             t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for role: {results[0][0]}]```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            # For the first page, append the closing code block.
+            await ctx.send(pages[0] + "\n```")
+            # For any subsequent pages, prepend with the python code block start and append the closing.
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
 
     @dp_guild.command(name="member")
     async def dp_guild_member(self, ctx, member: discord.Member = None):
@@ -373,9 +393,14 @@ class ListPermissions(commands.Cog):
             if value:
                 continue
             t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for user: {member.display_name}] in guild {ctx.guild.name}```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        sending = f"```ini\n[Permissions for user: {member.display_name}] in guild {ctx.guild.name}```\n```py\n{t}"
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            # First page: append the closing code block.
+            await ctx.send(pages[0] + "\n```")
+            # For subsequent pages: prepend with code block start and append the closing.
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
 
     @deniedpermissions.group(name="channel")
     async def dp_channel(self, ctx):
@@ -405,9 +430,12 @@ class ListPermissions(commands.Cog):
             if value:
                 continue
             t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for user: {member.display_name}] in channel {channel.name}```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        sending = f"```ini\n[Permissions for user: {member.display_name}] in channel {channel.name}```\n```py\n{t}"
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            await ctx.send(pages[0] + "\n```")
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
 
     @dp_channel.command(name="role")
     async def dp_channel_role(
@@ -452,7 +480,9 @@ class ListPermissions(commands.Cog):
         for perm, value in permissions:
             if value:
                 continue
-            t.add_row([perm, value])
-        sending = f"```ini\n[Permissions for role: {results[0][0]} in channel {channel.name}]```\n```py\n{t}```"
-        for page in pagify(sending):
-            await ctx.send(sending)
+        sending = f"```ini\n[Permissions for role: {results[0][0]} in channel {channel.name}]```\n```py\n{t}"
+        pages = list(pagify(sending, page_length=1900))
+        if pages:
+            await ctx.send(pages[0] + "\n```")
+            for page in pages[1:]:
+                await ctx.send("```py\n" + page + "\n```")
